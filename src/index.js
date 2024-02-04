@@ -3,7 +3,8 @@ import os from 'os';
 import path from 'path';
 import './utils/capitalize.js';
 import { parseUserName } from './services/parseArgs.js';
-import { changeDirectory, listDirectoryContents, upDirectory } from './services/directoryManager.js'
+import { changeDirectory, listDirectoryContents, upDirectory } from './services/directoryManager.js';
+import { filePrint } from './services/fileManager.js';
 
 
 const fileManager = async () => {
@@ -46,6 +47,9 @@ const fileManager = async () => {
         break;
       case 'ls':
         await listDirectoryContents(workingDirectory);
+        break;
+      case 'cat':
+        await filePrint(workingDirectory, argument);
         break;
       case 'exit':
         rl.close();
