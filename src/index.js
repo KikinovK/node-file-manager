@@ -1,10 +1,9 @@
 import readline from 'readline/promises';
 import os from 'os';
-import path from 'path';
 import './utils/capitalize.js';
 import { parseUserName } from './services/parseArgs.js';
 import { changeDirectory, listDirectoryContents, upDirectory } from './services/directoryManager.js';
-import { copyFile, createFile, filePrint, renameFile } from './services/fileManager.js';
+import { copyFile, createFile, deleteFile, filePrint, moveFile, renameFile } from './services/fileManager.js';
 
 
 const fileManager = async () => {
@@ -60,6 +59,12 @@ const fileManager = async () => {
         break;
       case 'cp':
         await copyFile(workingDirectory, argument, argSecond);
+        break;
+      case 'mv':
+        await moveFile(workingDirectory, argument, argSecond);
+        break;
+      case 'rm':
+        await deleteFile(workingDirectory, argument);
         break;
       case 'exit':
         rl.close();
