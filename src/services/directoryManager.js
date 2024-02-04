@@ -12,11 +12,40 @@ export const changeDirectory = async (workingDirectory, argument) => {
 
   const newPath = path.resolve(workingDirectory, argument);
   try {
-    await fsPromises.access(newPath, fs.constants.F_OK);
-    console.log(`Current working directory changed to ${newPath}`);
-    return newPath;
+    const stats = await fsPromises.stat(newPath);
+    if (stats.isDirectory()) {
+      console.log(`Current working directory changed to ${newPath}`);
+      return newPath;
+    }
+    throw new Error;
   } catch (err) {
     console.log('Invalid path');
     return workingDirectory;
+  }
+}
+
+export const listDirectoryContents = async (workingDirectory) => {
+  try {
+    const filesAndDirs = await fsPromises.readdir(workingDirectory, { withFileTypes: true });
+
+    const directories = filesAndDirs.filter(item => item.isDirectory()).map(item => (
+      {
+        name: item.name,
+        type: 'directory',
+      }
+    ));
+    const files = filesAndDirs.filter(item => item.isFile()).map(item => (
+      {
+        name: item.name,
+        type: 'files',
+      }
+    ));
+
+    directories.sort();
+    files.sort();
+
+    console.table([...directories, ...files].map(item => ({ 'Name': item.name, 'Type': item.type })));
+  } catch (err) {
+    console.error('Error reading directory:', err);
   }
 }
