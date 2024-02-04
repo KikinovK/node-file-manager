@@ -126,5 +126,47 @@ export const copyFile = async (workingDirectory, argument, argSecond) => {
   } catch (err) {
     console.error('Error copying file:', err);
   }
+}
 
+export const deleteFile = async (workingDirectory, argument) => {
+
+  if (!argument) {
+    console.log('You must specify the path to the file');
+    return;
+  }
+
+  const filePath = path.join(workingDirectory, argument);
+
+  try {
+    await fsPromises.unlink(filePath);
+    console.log(`File ${filePath} deleted successfully`);
+  } catch (err) {
+    console.error('Error deleting file:', err);
+  }
+}
+
+export const moveFile = async (workingDirectory, argument, argSecond) => {
+
+  if (!argument) {
+    console.log('You must specify the path to the file');
+    return;
+  }
+
+  if (!argSecond) {
+    console.log('You must specify the new path to the file');
+    return;
+  }
+
+  const sourcePath = path.join(workingDirectory, argument);
+  const destinationPath = path.join(workingDirectory, argSecond, path.basename(sourcePath));
+
+
+  try {
+    await copyFile(workingDirectory, argument, argSecond);
+    await deleteFile(workingDirectory, argument);
+
+    console.log(`File successfully moved from ${sourcePath} to ${destinationPath}`);
+  } catch (err) {
+    console.error('Error moving file:', err);
+  }
 }
