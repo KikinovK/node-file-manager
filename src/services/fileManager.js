@@ -5,7 +5,7 @@ import path from 'path';
 export const filePrint = async (workingDirectory, argument) => {
 
   if (!argument) {
-    console.log('You must specify the path to the directory');
+    console.log('You must specify the path to the file');
     return;
   }
 
@@ -42,7 +42,7 @@ export const filePrint = async (workingDirectory, argument) => {
 export const createFile = async (workingDirectory, argument) => {
 
   if (!argument) {
-    console.log('You must specify the path to the directory');
+    console.log('You must specify the path to the file');
     return;
   }
 
@@ -57,4 +57,28 @@ export const createFile = async (workingDirectory, argument) => {
   } catch (err) {
     console.error('Error creating file:', err);
   }
+}
+
+export const renameFile = async (workingDirectory, argument, argSecond) => {
+
+  if (!argument) {
+    console.log('You must specify the path to the file');
+    return;
+  }
+
+  if (!argSecond) {
+    console.log('You must specify the new name to the file');
+    return;
+  }
+
+  const oldPath = path.join(workingDirectory, argument);
+  const newPath = path.join(path.dirname(oldPath), argSecond);
+
+  try {
+    await fsPromises.rename(oldPath, newPath);
+    console.log(`The file was successfully renamed from ${oldPath} to ${newPath}`);
+  } catch (err) {
+    console.error('Error when renaming a file:', err);
+  }
+
 }
