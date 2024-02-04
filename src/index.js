@@ -4,7 +4,7 @@ import path from 'path';
 import './utils/capitalize.js';
 import { parseUserName } from './services/parseArgs.js';
 import { changeDirectory, listDirectoryContents, upDirectory } from './services/directoryManager.js';
-import { createFile, filePrint } from './services/fileManager.js';
+import { createFile, filePrint, renameFile } from './services/fileManager.js';
 
 
 const fileManager = async () => {
@@ -35,6 +35,7 @@ const fileManager = async () => {
 
     const command = args[0].toLowerCase();
     const argument = args[1];
+    const argSecond = args[2];
     console.log('command', command);
     console.log('argument', argument);
 
@@ -53,6 +54,9 @@ const fileManager = async () => {
         break;
       case 'add':
         await createFile(workingDirectory, argument);
+        break;
+      case 'rn':
+        await renameFile(workingDirectory, argument, argSecond);
         break;
       case 'exit':
         rl.close();
