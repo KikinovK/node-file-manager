@@ -37,5 +37,24 @@ export const filePrint = async (workingDirectory, argument) => {
     console.log('Invalid path');
     return workingDirectory;
   }
+}
 
+export const createFile = async (workingDirectory, argument) => {
+
+  if (!argument) {
+    console.log('You must specify the path to the directory');
+    return;
+  }
+
+  const filePath = path.join(workingDirectory, argument);
+  const directory = path.dirname(filePath);
+
+  try {
+    await fsPromises.mkdir(directory, { recursive: true });
+
+    await fsPromises.writeFile(filePath, '');
+    console.log(`Empty file ${filePath} created successfully`);
+  } catch (err) {
+    console.error('Error creating file:', err);
+  }
 }
