@@ -5,6 +5,7 @@ import { parseUserName } from './services/parseArgs.js';
 import { changeDirectory, listDirectoryContents, upDirectory } from './services/directoryManager.js';
 import { copyFile, createFile, deleteFile, filePrint, moveFile, renameFile } from './services/fileManager.js';
 import { osManager } from './services/osManager.js';
+import { printHash } from './services/hashManager.js';
 
 
 const fileManager = async () => {
@@ -69,6 +70,9 @@ const fileManager = async () => {
         break;
       case 'os':
         osManager(argument);
+        break;
+      case 'hash':
+        printHash(workingDirectory, argument);
         break;
       case 'exit':
       rl.close();
