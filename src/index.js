@@ -4,6 +4,7 @@ import './utils/capitalize.js';
 import { parseUserName } from './services/parseArgs.js';
 import { changeDirectory, listDirectoryContents, upDirectory } from './services/directoryManager.js';
 import { copyFile, createFile, deleteFile, filePrint, moveFile, renameFile } from './services/fileManager.js';
+import { osManager } from './services/osManager.js';
 
 
 const fileManager = async () => {
@@ -66,9 +67,12 @@ const fileManager = async () => {
       case 'rm':
         await deleteFile(workingDirectory, argument);
         break;
-      case 'exit':
-        rl.close();
+      case 'os':
+        osManager(argument);
         break;
+      case 'exit':
+      rl.close();
+      break;
       default:
         console.log('Unknown instruction');
     }
