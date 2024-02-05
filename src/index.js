@@ -6,6 +6,7 @@ import { changeDirectory, listDirectoryContents, upDirectory } from './services/
 import { copyFile, createFile, deleteFile, filePrint, moveFile, renameFile } from './services/fileManager.js';
 import { osManager } from './services/osManager.js';
 import { printHash } from './services/hashManager.js';
+import { compressFile, decompressFile } from './services/compressManager.js';
 
 
 const fileManager = async () => {
@@ -72,7 +73,13 @@ const fileManager = async () => {
         osManager(argument);
         break;
       case 'hash':
-        printHash(workingDirectory, argument);
+        await printHash(workingDirectory, argument);
+        break;
+      case 'compress':
+        await compressFile(workingDirectory, argument, argSecond);
+        break;
+      case 'decompress':
+        await decompressFile(workingDirectory, argument, argSecond);
         break;
       case 'exit':
       rl.close();
