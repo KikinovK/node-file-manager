@@ -1,8 +1,7 @@
-import fs from 'fs';
 import fsPromises from 'fs/promises';
 import path from 'path';
 
-export const upDirectory = (workingDirectory) => path.resolve(workingDirectory, '..');
+export const upDirectory = async (workingDirectory) => path.resolve(workingDirectory, '..');
 
 export const changeDirectory = async (workingDirectory, argument) => {
   if (!argument) {

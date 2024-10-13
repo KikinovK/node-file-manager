@@ -1,19 +1,15 @@
 import readline from 'readline/promises';
 import os from 'os';
+
 import './utils/capitalize.js';
 import { parseUserName } from './services/parseArgs.js';
-import { changeDirectory, listDirectoryContents, upDirectory } from './services/directoryManager.js';
-import { copyFile, createFile, deleteFile, filePrint, moveFile, renameFile } from './services/fileManager.js';
-import { osManager } from './services/osManager.js';
-import { printHash } from './services/hashManager.js';
-import { compressFile, decompressFile } from './services/compressManager.js';
-
+import { commands } from './services/comands.js';
 
 const fileManager = async () => {
 
   let workingDirectory = os.homedir();
 
- const printCurrentWorkingDirectory = () => {
+  const printCurrentWorkingDirectory = () => {
     console.log(`You are currently in ${workingDirectory}`);
   }
 
@@ -38,55 +34,21 @@ const fileManager = async () => {
     const command = args[0].toLowerCase();
     const argument = args[1];
     const argSecond = args[2];
-    console.log('command', command);
-    console.log('argument', argument);
 
-    switch (command) {
-      case 'cd':
-        workingDirectory = await changeDirectory(workingDirectory, argument);
-        break;
-      case 'up':
-        workingDirectory = upDirectory(workingDirectory);
-        break;
-      case 'ls':
-        await listDirectoryContents(workingDirectory);
-        break;
-      case 'cat':
-        await filePrint(workingDirectory, argument);
-        break;
-      case 'add':
-        await createFile(workingDirectory, argument);
-        break;
-      case 'rn':
-        await renameFile(workingDirectory, argument, argSecond);
-        break;
-      case 'cp':
-        await copyFile(workingDirectory, argument, argSecond);
-        break;
-      case 'mv':
-        await moveFile(workingDirectory, argument, argSecond);
-        break;
-      case 'rm':
-        await deleteFile(workingDirectory, argument);
-        break;
-      case 'os':
-        osManager(argument);
-        break;
-      case 'hash':
-        await printHash(workingDirectory, argument);
-        break;
-      case 'compress':
-        await compressFile(workingDirectory, argument, argSecond);
-        break;
-      case 'decompress':
-        await decompressFile(workingDirectory, argument, argSecond);
-        break;
-      case 'exit':
+    console.log('command', command);
+    if (command==='exit') {
       rl.close();
-      break;
-      default:
-        console.log('Unknown instruction');
+      return;
     }
+
+    const executeCommand = commands[command];
+
+    if (executeCommand) {
+      workingDirectory = await executeCommand(workingDirectory, argument, argSecond);
+    } else {
+      console.log('Unknown instruction');
+    }
+
     printCurrentWorkingDirectory();
     rl.prompt();
   });

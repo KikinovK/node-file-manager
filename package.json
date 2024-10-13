@@ -1,7 +1,7 @@
 {
   "name": "node-file-manager",
   "version": "1.0.0",
-  "description": "https://github.com/AlreadyBored/nodejs-assignments/blob/main/assignments/nodejs-basics/assignment.md",
+  "description": "https://github.com/AlreadyBored/nodejs-assignments/blob/main/assignments/file-manager/assignment.md",
   "engines": {
     "node": ">=20.0.0"
   },
