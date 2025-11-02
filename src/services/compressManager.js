@@ -4,22 +4,16 @@ import path from 'path';
 import zlib from 'zlib';
 
 
-export const compressFile = async (workingDirectory, argument, argSecond) => {
+export const compressFile = async ({ workingDirectory, argumentArray: [argument, argSecond] }) => {
   const extension = '.br';
 
   if (!argument) {
-    console.log('You must specify the path to the file');
-    return;
-  }
-
-  if (!argSecond) {
-    console.log('You must specify the path to the compress file');
-    return;
+    return { message: 'You must specify the path to the file\n' };
   }
 
   const sourcePath = path.join(workingDirectory, argument);
   const parsedSourcePath = path.parse(sourcePath);
-  const destinationPath = path.join(workingDirectory, argSecond, parsedSourcePath.base + extension);
+  const destinationPath = path.join(workingDirectory, argSecond || '', parsedSourcePath.base + extension);
 
   const directory = path.dirname(destinationPath);
 
@@ -27,49 +21,41 @@ export const compressFile = async (workingDirectory, argument, argSecond) => {
     await fsPromises.mkdir(directory, { recursive: true });
 
     return new Promise((resolve, reject) => {
-      const readStream = fs.createReadStream(sourcePath, { encoding: 'utf-8' });
+      const readStream = fs.createReadStream(sourcePath);
       const writeStream = fs.createWriteStream(destinationPath);
       const brotliCompressStream = zlib.createBrotliCompress();
 
-      readStream
-        .pipe(brotliCompressStream)
-        .pipe(writeStream);
+      const pipeline = readStream.pipe(brotliCompressStream).pipe(writeStream);
 
-      writeStream.on('finish', () => {
-        console.log(`${sourcePath} was successfully compressed and written to ${destinationPath}`);
-        resolve();
+      pipeline.on('finish', () => {
+        resolve({ message: `File successfully compressed from ${sourcePath} to ${destinationPath}\n` });
+      });
+
+      readStream.on('error', (err) => {
+        resolve({ message: `Error while reading file:\n${err}\n` });
       });
 
       writeStream.on('error', (err) => {
-        console.error('Error while writing file:', err);
-        reject();
+        resolve({ message: `Error while writing file:\n${err}\n` });
       });
 
       brotliCompressStream.on('error', (err) => {
-        console.error('Error while compressing file:', err);
-        reject();
+        resolve({ message: `Error while compressing file:\n${err}\n` });
       });
     });
   } catch (err) {
-    console.error('Error compressing file:', err);
+    return { message: `Error compressing file:\n${err}\n` };
   }
 }
 
-export const decompressFile = async (workingDirectory, argument, argSecond) => {
-
+export const decompressFile = async ({ workingDirectory, argumentArray: [argument, argSecond] }) => {
   if (!argument) {
-    console.log('You must specify the path to the file');
-    return;
-  }
-
-  if (!argSecond) {
-    console.log('You must specify the path to the decompress file');
-    return;
+    return { message: 'You must specify the path to the file\n' };
   }
 
   const sourcePath = path.join(workingDirectory, argument);
   const parsedSourcePath = path.parse(sourcePath);
-  const destinationPath = path.join(workingDirectory, argSecond, parsedSourcePath.name);
+  const destinationPath = path.join(workingDirectory, argSecond || '', parsedSourcePath.name);
 
   const directory = path.dirname(destinationPath);
 
@@ -77,30 +63,29 @@ export const decompressFile = async (workingDirectory, argument, argSecond) => {
     await fsPromises.mkdir(directory, { recursive: true });
 
     return new Promise((resolve, reject) => {
-      const readStream = fs.createReadStream(sourcePath, { encoding: 'utf-8' });
+      const readStream = fs.createReadStream(sourcePath);
       const writeStream = fs.createWriteStream(destinationPath);
       const brotliDecompressStream = zlib.createBrotliDecompress();
 
-      readStream
-        .pipe(brotliDecompressStream)
-        .pipe(writeStream);
+      const pipeline = readStream.pipe(brotliDecompressStream).pipe(writeStream);
 
-      writeStream.on('finish', () => {
-        console.log(`${sourcePath} was successfully decompressed and written to ${destinationPath}`);
-        resolve();
+      pipeline.on('finish', () => {
+        resolve({ message: `File successfully decompressed from ${sourcePath} to ${destinationPath}\n` });
+      });
+
+      readStream.on('error', (err) => {
+        resolve({ message: `Error while reading file:\n${err}\n` });
       });
 
       writeStream.on('error', (err) => {
-        console.error('Error while writing file:', err);
-        reject();
+        resolve({ message: `Error while writing file:\n${err}\n` });
       });
 
       brotliDecompressStream.on('error', (err) => {
-        console.error('Error while decompressing file:', err);
-        reject();
+        resolve({ message: `Error while decompressing file:\n${err}\n` });
       });
     });
   } catch (err) {
-    console.error('Error compressing file:', err);
+    return { message: `Error decompressing file:\n${err}\n` };
   }
 }

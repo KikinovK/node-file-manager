@@ -18,12 +18,6 @@ export const commands = {
   'rm': deleteFile,
   'os': osManager,
   'hash': showHash,
-  'compress': async (workingDirectory, arg, arg2) => {
-    await compressFile(workingDirectory, arg, arg2);
-    return workingDirectory
-  },
-  'decompress': async (workingDirectory, arg, arg2) => {
-    await decompressFile(workingDirectory, arg, arg2);
-    return workingDirectory
-  },
+  'compress': compressFile,
+  'decompress': decompressFile,
 };
