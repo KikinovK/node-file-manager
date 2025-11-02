@@ -2,10 +2,9 @@ import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
 
-export const printHash = async (workingDirectory, argument) => {
+export const showHash = async ({ workingDirectory, argumentArray: [argument] }) => {
   if (!argument) {
-    console.log('You must specify the path to the file');
-    return;
+    return { workingDirectory, message: 'You must specify the path to the file\n' };
   }
 
   const filePath = path.join(workingDirectory, argument);
@@ -22,16 +21,15 @@ export const printHash = async (workingDirectory, argument) => {
 
       readableStream.on('end', () => {
         const hashResult = hash.digest('hex');
-        console.log(`Hash file ${filePath}: ${hashResult}`);
-        resolve();
+        resolve({ workingDirectory, message: `Hash file ${filePath}:\n${hashResult}\n` });
       });
 
       readableStream.on('error', (err) => {
         console.error('Error reading file:', err);
-        reject(err);
+        resolve({ workingDirectory, message: `Error reading file\n${err}\n` });
       });
     });
   } catch (err) {
-    console.error('Error calculate hash file:', err);
+    return { workingDirectory, message: `Error calculate hash file:\n${err}\n` };
   }
 }

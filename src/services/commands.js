@@ -2,7 +2,7 @@
 import { changeDirectory, listDirectoryContents, upDirectory } from './directoryManager.js';
 import { copyFile, createFile, createDirectory, deleteFile, filePrint, moveFile, renameFile } from './fileManager.js';
 import { osManager } from './osManager.js';
-import { printHash } from './hashManager.js';
+import { showHash } from './hashManager.js';
 import { compressFile, decompressFile } from './compressManager.js';
 
 export const commands = {
@@ -17,10 +17,7 @@ export const commands = {
   'mv': moveFile,
   'rm': deleteFile,
   'os': osManager,
-  'hash': async (workingDirectory, arg) => {
-    await printHash(workingDirectory, arg);
-    return workingDirectory
-  },
+  'hash': showHash,
   'compress': async (workingDirectory, arg, arg2) => {
     await compressFile(workingDirectory, arg, arg2);
     return workingDirectory
