@@ -1,32 +1,35 @@
-import readline from 'readline/promises';
-import os from 'os';
+import { createInterface } from 'node:readline';
+import { homedir } from 'node:os';
 
 import './utils/capitalize.js';
 import { parseUserName } from './services/parseArgs.js';
-import { commands } from './services/comands.js';
+import { commands } from './services/commands.js';
 
 const fileManager = async () => {
 
-  let workingDirectory = os.homedir();
+  let workingDirectory = homedir();
 
-  const printCurrentWorkingDirectory = () => {
-    console.log(`You are currently in ${workingDirectory}`);
+  const rl = createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  });
+
+  const updatePrompt = (workingDirectory) => {
+    rl.setPrompt(`You are currently in ${workingDirectory}\n> `);
+    rl.prompt();
   }
 
   const args = process.argv.slice(2);
   const userName = parseUserName(args);
 
   if (!userName) {
-    console.error('Username not provided or invalid');
+    rl.output.write('Username not provided or invalid\n');
     process.exit(1);
   }
 
-  console.log(`Welcome to the File Manager, ${userName} \n`);
+  rl.output.write(`Welcome to the File Manager, ${userName}\n\n`);
 
-  const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout,
-  });
+  updatePrompt(workingDirectory);
 
   rl.on('line', async (input) => {
     const args = input.trim().split(' ');
@@ -35,8 +38,7 @@ const fileManager = async () => {
     const argument = args[1];
     const argSecond = args[2];
 
-    console.log('command', command);
-    if (command==='exit') {
+    if (command === 'exit') {
       rl.close();
       return;
     }
@@ -44,22 +46,28 @@ const fileManager = async () => {
     const executeCommand = commands[command];
 
     if (executeCommand) {
-      workingDirectory = await executeCommand(workingDirectory, argument, argSecond);
+      try {
+        const result = await executeCommand({
+          workingDirectory,
+          argumentArray: args.slice(1),
+        });
+          workingDirectory = result.workingDirectory;
+          if (result.message) {
+            rl.output.write(result.message);
+          }
+      } catch (error) {
+        rl.output.write('Error occurred\n', error);
+      }
     } else {
-      console.log('Unknown instruction');
+      rl.output.write('Unknown instruction\n');
     }
 
-    printCurrentWorkingDirectory();
-    rl.prompt();
+    updatePrompt(workingDirectory);
   });
 
   process.on('exit', () => {
-    console.log(`\nThank you for using File Manager, ${userName}, goodbye!`);
+    rl.output.write(`\nThank you for using File Manager, ${userName}, goodbye!\n`);
   });
-
-  printCurrentWorkingDirectory();
-
-  rl.prompt();
-}
+};
 
 fileManager();
