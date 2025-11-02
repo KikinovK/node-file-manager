@@ -51,10 +51,10 @@ const fileManager = async () => {
           workingDirectory,
           argumentArray: args.slice(1),
         });
-          workingDirectory = result.workingDirectory;
-          if (result.message) {
-            rl.output.write(result.message);
-          }
+        workingDirectory = result.workingDirectory;
+        if (result.message) {
+          rl.output.write(result.message);
+        }
       } catch (error) {
         rl.output.write('Error occurred\n', error);
       }

@@ -2,11 +2,13 @@ import fs from 'fs';
 import fsPromises from 'fs/promises';
 import path from 'path';
 
-export const filePrint = async (workingDirectory, argument) => {
+export const filePrint = async ({ workingDirectory, argumentArray: [argument] }) => {
 
   if (!argument) {
-    console.log('You must specify the path to the file');
-    return;
+    return {
+      workingDirectory,
+      message: 'You must specify the path to the file\n',
+    };
   }
 
   const filePath = path.join(workingDirectory, argument);
@@ -22,28 +24,30 @@ export const filePrint = async (workingDirectory, argument) => {
         });
 
         readableStream.on('end', () => {
-          console.log('File reading finished.');
-          resolve();
+          resolve({
+            workingDirectory,
+            message: 'File reading finished.\n',
+          });
         });
 
         readableStream.on('error', (err) => {
-          console.error('Error reading file:', err);
-          reject(err);
+          resolve({
+            workingDirectory,
+            message: `Error reading file\n${err}\n`,
+          });
         });
       });
     }
     throw new Error;
   } catch (err) {
-    console.log('Invalid path');
-    return workingDirectory;
+    return { workingDirectory, message: 'Invalid path\n' }
   }
 }
 
-export const createFile = async (workingDirectory, argument) => {
+export const createFile = async ({ workingDirectory, argumentArray: [argument] }) => {
 
   if (!argument) {
-    console.log('You must specify the path to the file');
-    return;
+    return { workingDirectory, message: 'You must specify the path to the file\n' };
   }
 
   const filePath = path.join(workingDirectory, argument);
@@ -53,22 +57,38 @@ export const createFile = async (workingDirectory, argument) => {
     await fsPromises.mkdir(directory, { recursive: true });
 
     await fsPromises.writeFile(filePath, '');
-    console.log(`Empty file ${filePath} created successfully`);
+
+    return { workingDirectory, message: `Empty file ${filePath} created successfully\n` };
   } catch (err) {
-    console.error('Error creating file:', err);
+    return { workingDirectory, message: `Error creating file: ${err}\n` };
   }
 }
 
-export const renameFile = async (workingDirectory, argument, argSecond) => {
+export const createDirectory = async ({ workingDirectory, argumentArray: [argument] }) => {
 
   if (!argument) {
-    console.log('You must specify the path to the file');
-    return;
+    return { workingDirectory, message: 'You must specify the path to the directory\n' };
+  }
+
+  const dirPath = path.join(workingDirectory, argument);
+
+  try {
+    await fsPromises.mkdir(dirPath, { recursive: true });
+
+    return { workingDirectory, message: `Directory ${dirPath} created successfully\n` };
+  } catch (err) {
+    return { workingDirectory, message: `Error creating directory: ${err}\n` };
+  }
+}
+
+export const renameFile = async ({ workingDirectory, argumentArray: [argument, argSecond] }) => {
+
+  if (!argument) {
+    return { workingDirectory, message: 'You must specify the path to the file\n' };
   }
 
   if (!argSecond) {
-    console.log('You must specify the new name to the file');
-    return;
+    return { workingDirectory, message: 'You must specify the new name to the file\n' };
   }
 
   const oldPath = path.join(workingDirectory, argument);
@@ -76,23 +96,21 @@ export const renameFile = async (workingDirectory, argument, argSecond) => {
 
   try {
     await fsPromises.rename(oldPath, newPath);
-    console.log(`The file was successfully renamed from ${oldPath} to ${newPath}`);
+    return { workingDirectory, message: `The file was successfully renamed from ${oldPath} to ${newPath}\n` };
   } catch (err) {
-    console.error('Error when renaming a file:', err);
+    return { workingDirectory, message: `Error when renaming a file: ${err}\n` };
   }
-
 }
 
-export const copyFile = async (workingDirectory, argument, argSecond) => {
+
+export const copyFile = async ({ workingDirectory, argumentArray: [argument, argSecond] }) => {
 
   if (!argument) {
-    console.log('You must specify the path to the file');
-    return;
+    return { workingDirectory, message: 'You must specify the path to the file\n' };
   }
 
   if (!argSecond) {
-    console.log('You must specify the new path to the file');
-    return;
+    return { workingDirectory, message: 'You must specify the new path to the file\n' };
   }
 
   const sourcePath = path.join(workingDirectory, argument);
@@ -107,54 +125,51 @@ export const copyFile = async (workingDirectory, argument, argSecond) => {
       const writeStream = fs.createWriteStream(destinationPath);
 
       readStream.on('error', (err) => {
-        console.error('Error reading file:', err);
-        reject();
+        resolve({ workingDirectory, message: `Error reading file\n${err}\n` });
       });
 
       writeStream.on('error', (err) => {
-        console.error('Error writing file:', err);
-        reject();
+        resolve({ workingDirectory, message: `Error writing file\n${err}\n` });
       });
 
       writeStream.on('finish', () => {
-        console.log(`File successfully copied from ${sourcePath} to ${destinationPath}`);
-        resolve();
+        resolve({
+          workingDirectory,
+          message: `File successfully copied from ${sourcePath} to ${destinationPath}\n`,
+        });
       });
 
       readStream.pipe(writeStream);
     });
   } catch (err) {
-    console.error('Error copying file:', err);
+    return { workingDirectory, message: `Error copying file: ${err}\n` };
   }
 }
 
-export const deleteFile = async (workingDirectory, argument) => {
+export const deleteFile = async ({ workingDirectory, argumentArray: [argument] }) => {
 
   if (!argument) {
-    console.log('You must specify the path to the file');
-    return;
+    return { workingDirectory, message: 'You must specify the path to the file\n' };
   }
 
   const filePath = path.join(workingDirectory, argument);
 
   try {
     await fsPromises.unlink(filePath);
-    console.log(`File ${filePath} deleted successfully`);
+    return { workingDirectory, message: `File ${filePath} deleted successfully\n` };
   } catch (err) {
-    console.error('Error deleting file:', err);
+    return { workingDirectory, message: `Error deleting file: ${err}\n` };
   }
 }
 
-export const moveFile = async (workingDirectory, argument, argSecond) => {
+export const moveFile = async ({ workingDirectory, argumentArray: [argument, argSecond] }) => {
 
   if (!argument) {
-    console.log('You must specify the path to the file');
-    return;
+    return { workingDirectory, message: 'You must specify the path to the file\n' };
   }
 
   if (!argSecond) {
-    console.log('You must specify the new path to the file');
-    return;
+    return { workingDirectory, message: 'You must specify the new path to the file\n' };
   }
 
   const sourcePath = path.join(workingDirectory, argument);
@@ -162,11 +177,11 @@ export const moveFile = async (workingDirectory, argument, argSecond) => {
 
 
   try {
-    await copyFile(workingDirectory, argument, argSecond);
-    await deleteFile(workingDirectory, argument);
+    await copyFile({ workingDirectory, argumentArray: [argument, argSecond] });
+    await deleteFile({ workingDirectory, argumentArray: [argument, argSecond] });
 
-    console.log(`File successfully moved from ${sourcePath} to ${destinationPath}`);
+    return { workingDirectory, message: `File successfully moved from ${sourcePath} to ${destinationPath}\n` };
   } catch (err) {
-    console.error('Error moving file:', err);
+    return { workingDirectory, message: `Error moving file: ${err}\n` };
   }
 }

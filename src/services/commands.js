@@ -1,6 +1,6 @@
 
 import { changeDirectory, listDirectoryContents, upDirectory } from './directoryManager.js';
-import { copyFile, createFile, deleteFile, filePrint, moveFile, renameFile } from './fileManager.js';
+import { copyFile, createFile, createDirectory, deleteFile, filePrint, moveFile, renameFile } from './fileManager.js';
 import { osManager } from './osManager.js';
 import { printHash } from './hashManager.js';
 import { compressFile, decompressFile } from './compressManager.js';
@@ -10,26 +10,12 @@ export const commands = {
   'up': upDirectory,
   'ls': listDirectoryContents,
   'cat': filePrint,
-  'add': async (workingDirectory, arg) => {
-    await createFile(workingDirectory, arg);
-    return workingDirectory
-  },
-  'rn': async (workingDirectory, arg, arg2) => {
-    await renameFile(workingDirectory, arg, arg2);
-    return workingDirectory
-  },
-  'cp': async (workingDirectory, arg, arg2) => {
-    await copyFile(workingDirectory, arg, arg2);
-    return workingDirectory
-  },
-  'mv': async (workingDirectory, arg, arg2) => {
-    await moveFile(workingDirectory, arg, arg2);
-    return workingDirectory
-  },
-  'rm': async (workingDirectory, arg) => {
-    await deleteFile(workingDirectory, arg);
-    return workingDirectory
-  },
+  'add': createFile,
+  'mkdir': createDirectory,
+  'rn': renameFile,
+  'cp': copyFile,
+  'mv': moveFile,
+  'rm': deleteFile,
   'os': (workingDirectory, arg) => {
     osManager(arg);
     return workingDirectory
