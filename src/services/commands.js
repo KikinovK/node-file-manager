@@ -16,10 +16,7 @@ export const commands = {
   'cp': copyFile,
   'mv': moveFile,
   'rm': deleteFile,
-  'os': (workingDirectory, arg) => {
-    osManager(arg);
-    return workingDirectory
-  },
+  'os': osManager,
   'hash': async (workingDirectory, arg) => {
     await printHash(workingDirectory, arg);
     return workingDirectory
