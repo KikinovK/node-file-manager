@@ -6,20 +6,10 @@ import { printHash } from './hashManager.js';
 import { compressFile, decompressFile } from './compressManager.js';
 
 export const commands = {
-  'cd': async (workingDirectory, arg) => {
-    return await changeDirectory(workingDirectory, arg);
-  },
-  'up': async (workingDirectory) => {
-    return await upDirectory(workingDirectory);
-  },
-  'ls': async (workingDirectory) => {
-    await listDirectoryContents(workingDirectory);
-    return workingDirectory
-  },
-  'cat': async (workingDirectory, arg) => {
-    await filePrint(workingDirectory, arg);
-    return workingDirectory
-  },
+  'cd': changeDirectory,
+  'up': upDirectory,
+  'ls': listDirectoryContents,
+  'cat': filePrint,
   'add': async (workingDirectory, arg) => {
     await createFile(workingDirectory, arg);
     return workingDirectory

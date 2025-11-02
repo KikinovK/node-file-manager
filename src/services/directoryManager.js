@@ -1,29 +1,41 @@
 import fsPromises from 'fs/promises';
 import path from 'path';
 
-export const upDirectory = async (workingDirectory) => path.resolve(workingDirectory, '..');
+import { tableToString } from '../utils/tableToString.js';
 
-export const changeDirectory = async (workingDirectory, argument) => {
+export const upDirectory = async ({ workingDirectory }) => {
+  return {
+    workingDirectory: path.resolve(workingDirectory, '..')
+  };
+}
+
+export const changeDirectory = async ({ workingDirectory, argumentArray: [argument] }) => {
   if (!argument) {
-    console.log('You must specify the path to the directory');
-    return workingDirectory;
+    return {
+      workingDirectory,
+      message: 'You must specify the path to the directory\n',
+    }
   }
 
   const newPath = path.resolve(workingDirectory, argument);
   try {
     const stats = await fsPromises.stat(newPath);
     if (stats.isDirectory()) {
-      console.log(`Current working directory changed to ${newPath}`);
-      return newPath;
+      return {
+        workingDirectory: newPath,
+        message: `Current working directory changed to ${newPath}\n`,
+      };
     }
     throw new Error;
   } catch (err) {
-    console.log('Invalid path');
-    return workingDirectory;
+    return {
+      workingDirectory,
+      message: 'Invalid path\n',
+    };
   }
 }
 
-export const listDirectoryContents = async (workingDirectory) => {
+export const listDirectoryContents = async ({ workingDirectory }) => {
   try {
     const filesAndDirs = await fsPromises.readdir(workingDirectory, { withFileTypes: true });
 
@@ -43,8 +55,14 @@ export const listDirectoryContents = async (workingDirectory) => {
     directories.sort();
     files.sort();
 
-    console.table([...directories, ...files].map(item => ({ 'Name': item.name, 'Type': item.type })));
+    return {
+      workingDirectory,
+      message: tableToString([...directories, ...files].map(item => ({ 'Name': item.name, 'Type': item.type }))),
+    }
   } catch (err) {
-    console.error('Error reading directory:', err);
+    return {
+      workingDirectory,
+      message: `Error reading directory: ${err}\n`,
+    }
   }
 }
