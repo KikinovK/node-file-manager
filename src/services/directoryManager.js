@@ -11,10 +11,7 @@ export const upDirectory = async ({ workingDirectory }) => {
 
 export const changeDirectory = async ({ workingDirectory, argumentArray: [argument] }) => {
   if (!argument) {
-    return {
-      workingDirectory,
-      message: 'You must specify the path to the directory\n',
-    }
+    return { message: 'You must specify the path to the directory\n' };
   }
 
   const newPath = path.resolve(workingDirectory, argument);
@@ -28,10 +25,7 @@ export const changeDirectory = async ({ workingDirectory, argumentArray: [argume
     }
     throw new Error;
   } catch (err) {
-    return {
-      workingDirectory,
-      message: 'Invalid path\n',
-    };
+    return { message: 'Invalid path\n' };
   }
 }
 
@@ -55,14 +49,8 @@ export const listDirectoryContents = async ({ workingDirectory }) => {
     directories.sort();
     files.sort();
 
-    return {
-      workingDirectory,
-      message: tableToString([...directories, ...files].map(item => ({ 'Name': item.name, 'Type': item.type }))),
-    }
+    return { message: tableToString([...directories, ...files].map(item => ({ 'Name': item.name, 'Type': item.type }))) };
   } catch (err) {
-    return {
-      workingDirectory,
-      message: `Error reading directory: ${err}\n`,
-    }
+    return { message: `Error reading directory: ${err}\n` }
   }
 }

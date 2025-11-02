@@ -38,7 +38,7 @@ const fileManager = async () => {
     const argument = args[1];
     const argSecond = args[2];
 
-    if (command === 'exit') {
+    if (command === '.exit') {
       rl.close();
       return;
     }
